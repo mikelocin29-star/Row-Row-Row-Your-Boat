@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Online Piano - Song Notation</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+  <style>
+    body {
+      background-color: #222;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+    }
+
+    /* Back Link Style */
+    .song-list-link {
+      margin-bottom: 25px;
+      background: #111;
+      padding: 10px 20px;
+      border-radius: 6px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+
+    .song-list-link a {
+      color: #fff;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 14px;
+      transition: color 0.2s;
+    }
+
+    .song-list-link a:hover {
+      color: #4CAF50;
+    }
+
+    h1 {
+      margin-bottom: 5px;
+    }
+
+    p {
+      color: #aaa;
+      margin-bottom: 20px;
+      text-align: center;
+      max-width: 650px;
+    }
+
+    .sheet-music {
+      max-width: 400px;
+      width: 100%;
+      height: auto;
+      margin-bottom: 25px;
+      border-radius: 8px;
+      background: #fff;
+      padding: 10px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+
+    #piano {
+      display: flex;
+      position: relative;
+      background: #000;
+      padding: 10px;
+      border-radius: 8px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+
+    .key {
+      box-sizing: border-box;
+      position: relative;
+      cursor: pointer;
+      user-select: none;
+      border-radius: 0 0 5px 5px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      font-weight: bold;
+      transition: background 0.1s;
+    }
+
+    .white {
+      width: 40px;
+      height: 180px;
+      background: #fff;
+      color: #333;
+      border: 1px solid #ccc;
+      z-index: 1;
+      padding-bottom: 12px;
+      font-size: 11px;
+    }
+
+    .white.active, .white:active {
+      background: #d4d4d4;
+    }
+
+    .black {
+      width: 24px;
+      height: 110px;
+      background: #333;
+      color: #fff;
+      position: absolute;
+      z-index: 2;
+      border-radius: 0 0 4px 4px;
+      border: 1px solid #111;
+      padding-bottom: 8px;
+      font-size: 9px;
+    }
+
+    .black.active, .black:active {
+      background: #555;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Link back to your main song library (opens in the same tab) -->
+  <div class="song-list-link">
+    <a href="https://mikelocin29-star.github.io/Ms-Kim-s-Song-List/">← Back to Song Library</a>
+  </div>
+
+  <h1>Online Piano (C4 - G5)</h1>
+  <p>White keys: <b>1 to =</b> | Black keys: <b>Q,W | R,T,Y | I,O | [</b> (or click with your mouse!)</p>
+
+  <img src="notation.png" alt="Piano Grid Notation" class="sheet-music" onerror="this.style.display='none'">
+
+  <div id="piano">
+    <!-- White Keys (C4 to G5) -->
+    <div class="key white" data-note="C4" data-key="1">1</div>
+    <div class="key white" data-note="D4" data-key="2">2</div>
+    <div class="key white" data-note="E4" data-key="3">3</div>
+    <div class="key white" data-note="F4" data-key="4">4</div>
+    <div class="key white" data-note="G4" data-key="5">5</div>
+    <div class="key white" data-note="A4" data-key="6">6</div>
+    <div class="key white" data-note="B4" data-key="7">7</div>
+    <div class="key white" data-note="C5" data-key="8">8</div>
+    <div class="key white" data-note="D5" data-key="9">9</div>
+    <div class="key white" data-note="E5" data-key="0">0</div>
+    <div class="key white" data-note="F5" data-key="-">-</div>
+    <div class="key white" data-note="G5" data-key="=">=</div>
+
+    <!-- Black Keys -->
+    <div class="key black" data-note="C#4" data-key="q" style="left: 37px;">Q</div>
+    <div class="key black" data-note="D#4" data-key="w" style="left: 77px;">W</div>
+    <div class="key black" data-note="F#4" data-key="r" style="left: 157px;">R</div>
+    <div class="key black" data-note="G#4" data-key="t" style="left: 197px;">T</div>
+    <div class="key black" data-note="A#4" data-key="y" style="left: 237px;">Y</div>
+    <div class="key black" data-note="C#5" data-key="i" style="left: 317px;">I</div>
+    <div class="key black" data-note="D#5" data-key="o" style="left: 357px;">O</div>
+    <div class="key black" data-note="F#5" data-key="[" style="left: 437px;">[</div>
+  </div>
+
+  <script>
+    const pianoSampler = new Tone.Sampler({
+      urls: {
+        "C4": "C4.mp3",
+        "D#4": "Ds4.mp3",
+        "F#4": "Fs4.mp3",
+        "A4": "A4.mp3",
+      },
+      baseUrl: "https://tonejs.github.io/audio/salamander/",
+      onload: () => {
+        console.log("Piano samples loaded successfully!");
+      }
+    }).toDestination();
+
+    // Start playing when key is pressed down
+    async function startNote(note, element) {
+      if (Tone.context.state !== 'running') {
+        await Tone.start();
+      }
+      pianoSampler.triggerAttack(note);
+
+      if (element) {
+        element.classList.add('active');
+      }
+    }
+
+    // Stop playing when key is released
+    function stopNote(note, element) {
+      pianoSampler.triggerRelease(note);
+
+      if (element) {
+        element.classList.remove('active');
+      }
+    }
+
+    // Mouse Event Listeners (Press and Hold)
+    const keys = document.querySelectorAll('.key[data-note]');
+    keys.forEach(key => {
+      const note = key.dataset.note;
+      
+      key.addEventListener('mousedown', () => startNote(note, key));
+      key.addEventListener('mouseup', () => stopNote(note, key));
+      key.addEventListener('mouseleave', () => stopNote(note, key));
+    });
+
+    // Computer Keyboard Tracking (Press and Hold)
+    const pressedKeys = {};
+
+    window.addEventListener('keydown', (e) => {
+      if (e.repeat) return; // Prevent stuttering while holding
+
+      const targetKey = e.key.toLowerCase();
+      const keyElement = document.querySelector(`.key[data-key="${targetKey}"]`);
+
+      if (keyElement && !pressedKeys[targetKey]) {
+        pressedKeys[targetKey] = true;
+        startNote(keyElement.dataset.note, keyElement);
+      }
+    });
+
+    window.addEventListener('keyup', (e) => {
+      const targetKey = e.key.toLowerCase();
+      const keyElement = document.querySelector(`.key[data-key="${targetKey}"]`);
+
+      if (keyElement) {
+        delete pressedKeys[targetKey];
+        stopNote(keyElement.dataset.note, keyElement);
+      }
+    });
+  </script>
+</body>
+</html>
